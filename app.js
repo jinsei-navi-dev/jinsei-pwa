@@ -6,6 +6,9 @@ const titleEl = document.getElementById("title");
 const urlEl = document.getElementById("url");
 const tagsEl = document.getElementById("tags");
 const memoEl = document.getElementById("memo");
+const backupExportBtn = document.getElementById("backup-export");
+const backupImportInput = document.getElementById("backup-import");
+const backupMessage = document.getElementById("backup-message");
 
 const KEY = "jinsei_clips_v1";
 
@@ -67,6 +70,66 @@ function escapeHtml(str) {
 function escapeAttr(str) {
   // minimal safe handling
   return String(str || "").replace(/"/g, "%22");
+}
+
+function setBackupMessage(text, isError = false) {
+  if (!backupMessage) return;
+  backupMessage.textContent = text;
+  backupMessage.classList.toggle("error", Boolean(isError));
+}
+
+function exportBackup() {
+  try {
+    const raw = localStorage.getItem(KEY) || "[]";
+    const parsed = JSON.parse(raw);
+    const json = JSON.stringify(parsed, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const date = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `jinsei_backup_${date}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setBackupMessage("エクスポートしました。");
+  } catch {
+    setBackupMessage("エクスポートに失敗しました。JSONを確認してください。", true);
+  }
+}
+
+if (backupExportBtn) {
+  backupExportBtn.addEventListener("click", exportBackup);
+}
+
+if (backupImportInput) {
+  backupImportInput.addEventListener("change", () => {
+    const file = backupImportInput.files && backupImportInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const text = String(reader.result || "");
+        const parsed = JSON.parse(text);
+        if (!Array.isArray(parsed)) {
+          throw new Error("Invalid backup format");
+        }
+        localStorage.setItem(KEY, JSON.stringify(parsed));
+        render();
+        setBackupMessage("インポートしました。");
+      } catch {
+        setBackupMessage("インポートに失敗しました。JSONを確認してください。", true);
+      } finally {
+        backupImportInput.value = "";
+      }
+    };
+    reader.onerror = () => {
+      setBackupMessage("インポートに失敗しました。ファイルを読み込めません。", true);
+      backupImportInput.value = "";
+    };
+    reader.readAsText(file);
+  });
 }
 
 form.addEventListener("submit", (e) => {

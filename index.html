@@ -23,6 +23,18 @@
       <button type="submit">保存</button>
     </form>
 
+    <section id="backup" aria-labelledby="backup-title">
+      <h2 id="backup-title">バックアップ</h2>
+      <div class="backup-row">
+        <button type="button" id="backup-export">エクスポート</button>
+        <label class="file">
+          インポート
+          <input id="backup-import" type="file" accept="application/json,.json" />
+        </label>
+      </div>
+      <p id="backup-message" class="message" aria-live="polite"></p>
+    </section>
+
     <input id="q" placeholder="検索…" autocomplete="off" />
     <ul id="list"></ul>
   </main>
