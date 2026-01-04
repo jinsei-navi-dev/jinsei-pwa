@@ -16,9 +16,14 @@
 
   <main>
     <form id="form">
-      <input id="text" placeholder="メモを追加…" autocomplete="off" />
-      <button type="submit">追加</button>
+      <input id="title" placeholder="タイトル（例：血糖値と空腹のしくみ）" autocomplete="off" />
+      <input id="url" placeholder="URL（https://...）" autocomplete="off" />
+      <input id="tags" placeholder="タグ（例：断食,健康,思考）" autocomplete="off" />
+      <textarea id="memo" placeholder="メモ（短く）"></textarea>
+      <button type="submit">保存</button>
     </form>
+
+    <input id="q" placeholder="検索…" autocomplete="off" />
     <ul id="list"></ul>
   </main>
 
